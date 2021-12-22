@@ -1,19 +1,36 @@
-import { FC, useMemo, useEffect } from 'react'
+import { FC, useMemo, useEffect, useState } from 'react'
 
 import { io, Socket } from 'socket.io-client'
 
 const Demo: FC = (props) => {
-  // 创建 socket 实例
-  let socket: Socket
+  const [socket, setSocket] = useState<Socket>()
+  const [users, setUsers] = useState<string[]>([])
 
   useEffect(() => {
-    socket = io('http://172.26.128.111:5000')
+    // 创建 socket 实例
+    setSocket(io('ws://172.26.128.111:5000'))
     return () => {
-      socket.close()
+      socket?.close()
     }
-  }, [])
+  }, [setSocket])
 
-  return <div>Demo Page</div>
+  useEffect(() => {
+    socket?.on('update-users', ({ users }) => {
+      setUsers(users)
+      console.log('update users: ', users)
+    })
+    return () => {
+      socket?.close()
+    }
+  }, [socket])
+
+  return (
+    <div>
+      {users.map((user) => (
+        <p key={user}>{user}</p>
+      ))}
+    </div>
+  )
 }
 
 export default Demo

@@ -34,7 +34,7 @@ export class Server {
 }
 
 function handleSocketConnection(io: SocketioServer) {
-  const activeSocketIds: string[] = [] // 当前连接的 socket
+  let activeSocketIds: string[] = [] // 当前连接的 socket
 
   io.on('connection', (socket) => {
     // 如果已存在 id
@@ -46,10 +46,18 @@ function handleSocketConnection(io: SocketioServer) {
     activeSocketIds.push(socket.id)
     console.log(`Socket connected. [SocketID: ${socket.id}]`)
 
+    // 推送用户列表
+    socket.emit('update-users', {
+      users: activeSocketIds.filter((id) => id !== socket.id),
+    })
+    socket.broadcast.emit('update-users', {
+      users: activeSocketIds.filter((id) => id === socket.id),
+    })
+
     // 连接断开
     socket.on('disconnect', () => {
       // 从记录中移除
-      activeSocketIds.filter((id) => id !== socket.id)
+      activeSocketIds = activeSocketIds.filter((id) => id !== socket.id)
       console.log(`Socket disconnected. [SocketID: ${socket.id}]`)
     })
   })

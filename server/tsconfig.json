@@ -1,0 +1,20 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "~": ["node_modules"]
+    }
+  },
+  "include": ["./src"],
+  "ts-node": {
+    // 这些选项是仅由 ts-node 使用的覆盖
+    // 与我们的 --compilerOptions 标志和我们的 TS_NODE_COMPILER_OPTIONS 环境变量
+    "compilerOptions": {
+      "module": "commonjs",
+      // 为了使用 import 正常导入 commonjs 包
+      "esModuleInterop": true
+    }
+  }
+}

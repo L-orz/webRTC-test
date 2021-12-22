@@ -1,0 +1,32 @@
+// antd Table 内容自适应高度
+// <Table className="antd-table-auto-height">
+// 必须配合 scroll={{y: ''}} 使用
+
+// e.g.
+// import AntdTableStyles from '@/style/modules/antd-table.module.less'
+//
+// <Table className={AntdTableStyles['antd-table-auto-height']} scroll={{ y: '' }}></Table>
+
+.antd-table-auto-height {
+  @apply h-full;
+
+  :global(.ant-spin-nested-loading) {
+    @apply h-full;
+
+    :global(.ant-spin-container) {
+      @apply h-full flex flex-col overflow-hidden;
+
+      :global(.ant-table) {
+        @apply flex-1 overflow-hidden;
+
+        :global(.ant-table-container) {
+          @apply h-full flex flex-col;
+
+          :global(.ant-table-body) {
+            @apply flex-1 overflow-y-auto;
+          }
+        }
+      }
+    }
+  }
+}

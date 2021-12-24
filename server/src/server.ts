@@ -47,11 +47,8 @@ function handleSocketConnection(io: SocketioServer) {
     console.log(`Socket connected. [SocketID: ${socket.id}]`)
 
     // 推送用户列表
-    socket.emit('update-users', {
-      users: activeSocketIds.filter((id) => id !== socket.id),
-    })
-    socket.broadcast.emit('update-users', {
-      users: activeSocketIds.filter((id) => id === socket.id),
+    io.emit('update-users', {
+      users: activeSocketIds,
     })
 
     // 连接断开
@@ -59,6 +56,34 @@ function handleSocketConnection(io: SocketioServer) {
       // 从记录中移除
       activeSocketIds = activeSocketIds.filter((id) => id !== socket.id)
       console.log(`Socket disconnected. [SocketID: ${socket.id}]`)
+
+      // 推送用户列表
+      socket.broadcast.emit('update-users', { users: activeSocketIds })
+    })
+
+    // 监听 call-user 并通知对应用户，将 offer 及 id 发送给用户
+    socket.on('call-user', ({ offer, to }) => {
+      console.log('call-user', to)
+      socket.to(to).emit('call', {
+        offer,
+        user: socket.id,
+      })
+    })
+
+    socket.on('answer', ({ answer, to }) => {
+      console.log('answer', to)
+      socket.to(to).emit('answer', {
+        answer,
+        user: socket.id,
+      })
+    })
+
+    socket.on('candidate', ({ candidate, to }) => {
+      console.log('candidate to', to)
+      io.emit('candidate', {
+        candidate,
+        user: socket.id,
+      })
     })
   })
 }

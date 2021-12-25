@@ -52,6 +52,12 @@ export function usePeerConnection({ onIceCandidateSuccess, onSendChannelOpen }: 
         onSendChannelOpen(sendChannel.send.bind(sendChannel))
       }
     }
+    sendChannel.onclose = (ev) => {
+      console.log('sendChannel close', ev)
+    }
+    sendChannel.onerror = (ev) => {
+      console.log('sendChannel error', ev)
+    }
     remoteConnection.ondatachannel = (event) => {
       // console.log('step-7.1 ---- [B] remoteConnection dataChannel 开启', event)
       const receiveChannel = event.channel

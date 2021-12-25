@@ -39,7 +39,7 @@ export function usePeerConnection({ onIceCandidateSuccess, onSendChannelOpen }: 
   // // 监听当前 connection 事件
   useEffect(() => {
     remoteConnection.onicecandidate = async (event) => {
-      // console.log('step-4.1 ---- [B] remoteConnection 出现 ICE 协议候选者', event.candidate)
+      console.log('step-4.1 ---- [B] remoteConnection 出现 ICE 协议候选者', event.candidate)
       if (event.candidate) {
         // console.log('step-4.2 ---- [B] 将候选者信息通过信令服务器发送给 [A]')
         onIceCandidateSuccess(event.candidate)

@@ -80,7 +80,7 @@ function handleSocketConnection(io: SocketioServer) {
 
     socket.on('candidate', ({ candidate, to }) => {
       console.log('candidate to', to)
-      io.emit('candidate', {
+      socket.to(to).emit('candidate', {
         candidate,
         user: socket.id,
       })

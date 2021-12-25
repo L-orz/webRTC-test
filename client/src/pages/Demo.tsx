@@ -4,7 +4,7 @@ import { usePeerConnection } from './usePeerConnection'
 import Send from './Send'
 
 const Demo: FC = (props) => {
-  const socket = useMemo(() => io('ws://172.26.128.111:5000'), [])
+  const socket = useMemo(() => io('ws://192.168.31.148:5000'), [])
   const [users, setUsers] = useState<string[]>([])
   // 过滤出除自身外的所有 user
   const otherUsers = useMemo(() => {
@@ -59,6 +59,7 @@ const Demo: FC = (props) => {
     socket.on('call', async ({ offer, user }) => {
       // console.log('step-2.1 ---- [B] 接收到信令服务器传递的 offer')
       const answer = await createAnswer(offer)
+      setTargetUser(user)
 
       // console.log('step-2.4 ---- [B] 将 answer 通过信令服务器发送给 [A]')
       socket.emit('answer', {
@@ -72,8 +73,6 @@ const Demo: FC = (props) => {
     })
     socket.on('candidate', async ({ candidate, user }) => {
       console.log('step-5.1 ---- [A] 接收到信令服务器传递的 candidate 候选者信息', candidate)
-      // TODO: setTargetUser 异步操作导致 undefined 待解决
-      if (socket.id === user) return
       console.log('step-5.2 ---- [A] 将 candidate 添加进 localConnection')
       await localConnection.addIceCandidate(candidate)
     })
@@ -83,12 +82,10 @@ const Demo: FC = (props) => {
       socket.off('answer')
       socket.off('candidate')
     }
-  }, [socket, createAnswer, receiveAnswer, localConnection])
+  }, [socket, createAnswer, receiveAnswer, localConnection, setTargetUser])
 
   // 点击用户，创建 RTCPeerConnection
   async function handleClick(user: string) {
-    setTargetUser(user)
-
     // console.log('step-1.1 ---- [A] 选择目标 [B]，准备进行连接')
     const offer = await createOffer()
 
@@ -121,6 +118,8 @@ const Demo: FC = (props) => {
       <div>{send ? <Send handleSend={handleSend}></Send> : null}</div>
       <div className="w-1/3">
         Locale device socket id: <span className=" text-primary">{socket.id}</span>
+        <br />
+        TargetUser: {targetUser}
       </div>
     </div>
   )
